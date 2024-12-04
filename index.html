@@ -24,21 +24,19 @@
         canvas.height = window.innerHeight;
 
         const tileSize = 50;
-        const flipProbability = 0.3; // 30% chance of flipping
-        const tileFlips = new Map();
 
-        function getTileColor(x, y, time) {
-            // Generate irregular color patterns based on position and time
-            const r = Math.abs(Math.sin(x * 0.1 + time * 0.001) * 255);
-            const g = Math.abs(Math.cos(y * 0.1 + time * 0.001) * 255);
-            const b = Math.abs(Math.sin(x * 0.1 + y * 0.1 + time * 0.000002) * 128 + 127);
+        function getTileColor(x, y) {
+            // Generate irregular color patterns based on position
+            const r = Math.abs(Math.sin(x * 0.1) * 255);
+            const g = Math.abs(Math.cos(y * 0.1) * 255);
+            const b = Math.abs(Math.sin(x * 0.1 + y * 0.1) * 128 + 127);
             return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
         }
 
         let offsetX = 0;
         let offsetY = 0;
 
-        function drawTiles(time) {
+        function drawTiles() {
             const startCol = Math.floor(offsetX / tileSize);
             const endCol = startCol + Math.ceil(canvas.width / tileSize) + 1;
             const startRow = Math.floor(offsetY / tileSize);
@@ -48,24 +46,8 @@
                 for (let row = startRow; row < endRow; row++) {
                     const x = col * tileSize - offsetX;
                     const y = row * tileSize - offsetY;
-
-                    const tileKey = `${col},${row}`;
-                    if (!tileFlips.has(tileKey) && Math.random() < flipProbability) {
-                        tileFlips.set(tileKey, Math.random() > 0.5 ? 'horizontal' : 'vertical');
-                    }
-
-                    ctx.save();
-                    ctx.translate(x + tileSize / 2, y + tileSize / 2);
-
-                    if (tileFlips.get(tileKey) === 'horizontal') {
-                        ctx.scale(-1, 1); // Flip horizontally
-                    } else if (tileFlips.get(tileKey) === 'vertical') {
-                        ctx.scale(1, -1); // Flip vertically
-                    }
-
-                    ctx.fillStyle = getTileColor(col, row, time);
-                    ctx.fillRect(-tileSize / 2, -tileSize / 2, tileSize, tileSize);
-                    ctx.restore();
+                    ctx.fillStyle = getTileColor(col, row);
+                    ctx.fillRect(x, y, tileSize, tileSize);
                 }
             }
         }
@@ -92,7 +74,8 @@
             if (isPanning) {
                 offsetX = initialOffsetX - (e.clientX - startPanX);
                 offsetY = initialOffsetY - (e.clientY - startPanY);
-                tileFlips.clear(); // Reset flip states on pan
+                clearCanvas();
+                drawTiles();
             }
         });
 
@@ -107,15 +90,11 @@
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            clearCanvas();
+            drawTiles();
         });
 
-        function animate(time) {
-            clearCanvas();
-            drawTiles(time);
-            requestAnimationFrame(animate);
-        }
-
-        animate(0);
+        drawTiles();
     </script>
 </body>
 </html>
