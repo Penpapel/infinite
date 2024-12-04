@@ -30,8 +30,8 @@
 
         function getTileColor(x, y, time) {
             // Generate irregular color patterns based on position and time
-            const r = Math.abs(Math.sin(x * 0.1 + time * 0.001) * 255);
-            const g = Math.abs(Math.cos(y * 0.1 + time * 0.001) * 255);
+            const r = Math.abs(Math.sin(x * 0.1 + time * 0.0002) * 255);
+            const g = Math.abs(Math.cos(y * 0.1 + time * 0.0002) * 255);
             const b = Math.abs(Math.sin(x * 0.1 + y * 0.1 + time * 0.000002) * 128 + 127);
             return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
         }
